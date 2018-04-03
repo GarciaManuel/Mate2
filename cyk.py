@@ -1,4 +1,4 @@
-# import fileinput
+import fileinput
 
 # lines = []
 # for line in fileinput.input():
@@ -6,6 +6,7 @@
 
 #for line in fileinput.input():
 	#key, ref= (for val in line.split())
+
 grammar = {}
 check = []
 def findNonTerminals(string):
@@ -49,6 +50,21 @@ def combinations(word1,word2):
 				comb.append(conc)
 	return comb
 
+def findNextNoEmpty(T,start,n):
+	aux=''
+	while(start<n):
+		if(T[start][0]!=""):
+			aux= T[start][0]
+		start+=1
+	return aux
+
+def findNextNoEmptyDiagonal(T,start,n):
+	aux=''
+	while(start<n):
+		if(T[start][start]!=""):
+			aux= T[start][start]
+		start+=1
+	return aux
 
 def CYK(T,word):
 	n = len(word)
@@ -61,15 +77,23 @@ def CYK(T,word):
 		
 			if m==n-2:
 				T[m][i]=findNonTerminalsFromArr(combinations(T[m+1][i],T[m+1][i+1]))
+			elif m==0 and T[m+1][i] =="" and T[m+1][i+1]=="":
+					aux =findNextNoEmpty(T,2,3)	
+					aux2=findNextNoEmptyDiagonal(T,2,3)
+					res = ''
+					res+=findNonTerminalsFromArr(combinations(aux,aux2))
+					T[m][i]=res
+
 			else:
 				answer=''
 				answer+=findNonTerminalsFromArr(combinations(T[m+1][i],T[n-1][i+abs(m-(n-1))]))
+				answer+=findNonTerminalsFromArr(combinations(T[m+1][i],T[n-2][i+abs(m-(n-1))]))
 				answer+=findNonTerminalsFromArr(combinations(T[n-1][i],T[m+1][i+1]))
 				T[m][i]=answer
 	
  
 	#print('\n'.join([' '.join(['{:4}'.format(item) for item in row]) 
-      #for row in T]))
+     # for row in T]))
 
 	start = list(grammar.keys())[0]
 	if start in T[0][0]:
@@ -77,9 +101,7 @@ def CYK(T,word):
 	else:
 		print('Rejected')
 
-
-for x in range(21):
-	line = input()
+for line in fileinput.input():
 	if(line[0].isupper()):
 		key  = [val for val in line.split()]
 		grammar[key[0]] = key[1:]
